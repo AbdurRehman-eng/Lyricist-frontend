@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import { API_BASE_URL } from './config';
+import useSEO from './lib/useSEO';
 
 // Editorial Brutalist Skeleton Loader
 const SongCardSkeleton = () => (
@@ -86,6 +87,14 @@ const formatArtists = (artists) => {
 
 function App() {
   const [query, setQuery] = useState('');
+
+  useSEO({
+    title: query ? `Search Results for "${query}" - Lyricist` : 'Lyricist - Lyric Search Engine',
+    description: query 
+      ? `Find lyrics and details for "${query}" on Lyricist. Browse matching songs, albums, and Spotify links.`
+      : 'Find the song you can\'t get out of your head. Search by lyrics, artist, or song title with our advanced AI-powered lyric search engine.',
+    keywords: 'lyric search, find song by lyrics, lyricist, song finder, lyric search engine, music search',
+  });
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -200,6 +209,8 @@ function App() {
             <div className="w-full max-w-[560px] relative group mb-stack-md">
               <input
                 type="text"
+                id="search-input-home"
+                name="search-input-home"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
@@ -207,6 +218,7 @@ function App() {
                 placeholder="Search by lyrics, artist, or song title..."
               />
               <button
+                id="search-button-home"
                 onClick={() => handleSearch()}
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high rounded transition-colors duration-100"
               >
@@ -241,6 +253,8 @@ function App() {
                     <span className="material-symbols-outlined absolute left-3 text-[#BBBBB7]">search</span>
                     <input
                       type="text"
+                      id="search-input-results"
+                      name="search-input-results"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={handleKeyPress}
@@ -257,12 +271,14 @@ function App() {
                     )}
                   </div>
                   <button
+                    id="search-button-results"
                     onClick={() => handleSearch()}
                     className="px-6 h-[46px] border border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100 font-label-caps text-label-caps rounded-sm uppercase tracking-wider flex items-center justify-center"
                   >
                     Search
                   </button>
                   <button
+                    id="reset-button-results"
                     onClick={handleReset}
                     className="p-3 h-[46px] hairline-all hover:bg-[#F0EFEA] text-secondary hover:text-primary transition-all duration-100 rounded-sm flex items-center justify-center"
                     title="Clear Search"

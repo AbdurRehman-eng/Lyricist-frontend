@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import { API_BASE_URL } from './config';
+import useSEO from './lib/useSEO';
 
 // Compact Spotify Embed
 const CompactSpotifyEmbed = ({ trackId }) => {
@@ -61,6 +62,12 @@ const formatArtists = (artists) => {
 };
 
 export default function ArchivePage() {
+  useSEO({
+    title: 'Song Archive Catalog - Lyricist',
+    description: 'Browse the complete indexed catalog of song titles, artists, and Spotify track links in the Lyricist database.',
+    keywords: 'song archive, song list, database index, indexed tracks, song catalog',
+  });
+
   const navigate = useNavigate();
   const [songs, setSongs] = useState([]);
   const [filteredSongs, setFilteredSongs] = useState([]);
@@ -199,6 +206,8 @@ export default function ArchivePage() {
                 <span className="material-symbols-outlined absolute left-3 text-[#BBBBB7] text-[20px]">search</span>
                 <input
                   type="text"
+                  id="archive-filter-input"
+                  name="archive-filter-input"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-[#fdf8f7] hairline-all py-3 pl-10 pr-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200"
@@ -206,6 +215,7 @@ export default function ArchivePage() {
                 />
                 {searchTerm && (
                   <button
+                    id="archive-filter-clear"
                     onClick={() => setSearchTerm('')}
                     className="absolute right-3 text-secondary hover:text-primary"
                   >

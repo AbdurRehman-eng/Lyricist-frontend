@@ -1,7 +1,14 @@
 import Navbar from './components/navbar';
 import Footer from './components/footer';
+import useSEO from './lib/useSEO';
 
 export default function AboutPage() {
+  useSEO({
+    title: 'About Lyricist - TF-IDF Search Engine',
+    description: 'Learn about the Lyricist search engine technology. Featuring inverted indexing, TF-IDF relevance ranking, and phonetic matching.',
+    keywords: 'lyricist engine, search algorithms, TF-IDF relevance, inverted indexing, music search tech',
+  });
+
   return (
     <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
       <Navbar />

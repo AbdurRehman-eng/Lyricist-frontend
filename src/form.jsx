@@ -2,8 +2,15 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import { API_BASE_URL } from './config';
+import useSEO from './lib/useSEO';
 
 export default function AddSongForm() {
+  useSEO({
+    title: 'Add Song to Index - Lyricist Database',
+    description: 'Index new music in the Lyricist search catalog. Input Spotify links, lyrics, and metadata to grow the database.',
+    keywords: 'add song, index lyrics, music metadata, spotify track indexing, lyric database upload',
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     spotifyLink: '',
@@ -196,6 +203,7 @@ export default function AddSongForm() {
             </div>
 
             <button
+              id="add-song-submit"
               type="submit"
               disabled={isLoading}
               className="w-full h-[48px] btn-default rounded-sm font-label-caps text-label-caps uppercase tracking-wider flex items-center justify-center gap-2 border border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100"

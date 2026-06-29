@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import { API_BASE_URL } from './config';
+import useSEO from './lib/useSEO';
 
 const SongCardSkeleton = () => (
   <div className="song-card hairline-all p-4 flex flex-col gap-4 animate-pulse rounded-[4px] bg-[#F7F6F3] min-w-0">
@@ -86,6 +87,12 @@ const SpeechRecognition = typeof window !== 'undefined' ? (window.SpeechRecognit
 const isSpeechSupported = !!SpeechRecognition;
 
 export default function AudioSearch() {
+  useSEO({
+    title: 'Hum to Find Song - Lyricist Audio Search',
+    description: 'Sing, hum, or describe a melody to query our neural lyric database. Lyricist Audio Search identifies songs instantly.',
+    keywords: 'audio search, hum to find song, humming search, voice lyric search, song recognizer',
+  });
+
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [results, setResults] = useState(null);
@@ -295,6 +302,7 @@ export default function AudioSearch() {
                       
                       {/* Inner breathing dot trigger */}
                       <button
+                        id="audio-mic-trigger"
                         onClick={isRecording ? stopRecording : startRecording}
                         className={`w-20 h-20 rounded-full bg-primary flex items-center justify-center relative cursor-pointer hover:scale-105 transition-transform duration-200 outline-none focus:outline-none ${isRecording ? 'bg-[#ba1a1a]' : ''}`}
                         aria-label={isRecording ? "Stop recording" : "Start recording"}
@@ -320,6 +328,7 @@ export default function AudioSearch() {
                   {/* Text action button */}
                   <div>
                     <button
+                      id="audio-text-trigger"
                       onClick={isRecording ? stopRecording : startRecording}
                       className="px-6 h-[46px] border border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100 font-label-caps text-label-caps rounded-sm uppercase tracking-wider flex items-center justify-center"
                     >
@@ -382,6 +391,7 @@ export default function AudioSearch() {
                         Found {results.ranked_results.length} matches
                       </span>
                       <button
+                        id="audio-reset-button"
                         onClick={handleReset}
                         className="font-metadata text-[14px] text-primary hover:text-secondary underline flex items-center gap-1"
                       >

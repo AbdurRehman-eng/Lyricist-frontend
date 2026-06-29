@@ -1,8 +1,15 @@
 import React from 'react';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
+import useSEO from './lib/useSEO';
 
 export default function TermsPage() {
+  useSEO({
+    title: 'Terms of Service - Lyricist',
+    description: 'Read Lyricist\'s terms of service and acceptable usage policy for the lyric search engine.',
+    keywords: 'terms of service, user agreement, copyright notice, legal terms, acceptable use policy',
+  });
+
   return (
     <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
       <Navbar />

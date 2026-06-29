@@ -1,8 +1,15 @@
 import React from 'react';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
+import useSEO from './lib/useSEO';
 
 export default function PrivacyPage() {
+  useSEO({
+    title: 'Privacy Policy - Lyricist',
+    description: 'Read Lyricist\'s privacy guidelines on search queries, audio recording processing, and user data safety.',
+    keywords: 'privacy policy, data usage, speech API privacy, user security, cookies',
+  });
+
   return (
     <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
       <Navbar />
