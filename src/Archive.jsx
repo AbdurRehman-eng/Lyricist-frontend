@@ -69,22 +69,49 @@ export default function ArchivePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedSongId, setExpandedSongId] = useState(null);
   
-  // Pagination
+  // Pagination & Server stats
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalSongsCount, setTotalSongsCount] = useState(0);
+  const [uniqueArtistsCount, setUniqueArtistsCount] = useState(0);
+  const [uniqueAlbumsCount, setUniqueAlbumsCount] = useState(0);
+  
   const songsPerPage = 15;
 
   useEffect(() => {
     const fetchSongs = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/songs`);
+        const queryParams = new URLSearchParams({
+          page: currentPage,
+          limit: songsPerPage,
+          search: searchTerm
+        });
+        const response = await fetch(`${API_BASE_URL}/songs?${queryParams.toString()}`);
         if (!response.ok) {
           throw new Error('Failed to load songs from index database.');
         }
         const data = await response.json();
-        // Sort songs alphabetically by name
-        const sorted = data.sort((a, b) => a.name.localeCompare(b.name));
-        setSongs(sorted);
-        setFilteredSongs(sorted);
+        
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          setSongs(data.songs || []);
+          setTotalSongsCount(data.total || 0);
+          setTotalPages(data.pages || 1);
+          setUniqueArtistsCount(data.unique_artists || 0);
+          setUniqueAlbumsCount(data.unique_albums || 0);
+        } else {
+          // Fallback if backend returned plain list
+          const list = data || [];
+          const sorted = list.sort((a, b) => a.name.localeCompare(b.name));
+          setSongs(sorted.slice((currentPage - 1) * songsPerPage, currentPage * songsPerPage));
+          setTotalSongsCount(sorted.length);
+          setTotalPages(Math.ceil(sorted.length / songsPerPage));
+          
+          const artists = new Set(sorted.map(s => formatArtists(s.artists).split(', ')[0])).size;
+          const albums = new Set(sorted.map(s => s.album_name).filter(Boolean)).size;
+          setUniqueArtistsCount(artists);
+          setUniqueAlbumsCount(albums);
+        }
         setIsLoading(false);
       } catch (err) {
         console.error('Error fetching songs:', err);
@@ -93,24 +120,16 @@ export default function ArchivePage() {
       }
     };
 
-    fetchSongs();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchSongs();
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, searchTerm]);
 
   useEffect(() => {
-    const query = searchTerm.toLowerCase().trim();
-    if (!query) {
-      setFilteredSongs(songs);
-    } else {
-      const filtered = songs.filter(song => {
-        const title = (song.name || '').toLowerCase();
-        const artists = formatArtists(song.artists).toLowerCase();
-        const album = (song.album_name || '').toLowerCase();
-        return title.includes(query) || artists.includes(query) || album.includes(query);
-      });
-      setFilteredSongs(filtered);
-    }
     setCurrentPage(1);
-  }, [searchTerm, songs]);
+  }, [searchTerm]);
 
   const toggleExpand = (docId) => {
     if (expandedSongId === docId) {
@@ -125,19 +144,12 @@ export default function ArchivePage() {
   };
 
   // Stats calculation
-  const totalSongs = songs.length;
-  const uniqueArtists = new Set(songs.map(s => {
-    const formatted = formatArtists(s.artists);
-    return formatted.split(', ')[0]; // take the primary artist
-  })).size;
-  const uniqueAlbums = new Set(songs.map(s => s.album_name).filter(Boolean)).size;
+  const totalSongs = totalSongsCount;
+  const uniqueArtists = uniqueArtistsCount;
+  const uniqueAlbums = uniqueAlbumsCount;
 
   // Pagination Logic
-  const totalPages = Math.ceil(filteredSongs.length / songsPerPage);
-  const paginatedSongs = filteredSongs.slice(
-    (currentPage - 1) * songsPerPage,
-    currentPage * songsPerPage
-  );
+  const paginatedSongs = songs;
 
   return (
     <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
