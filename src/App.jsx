@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from './components/navbar';
+import Footer from './components/footer';
 import { API_BASE_URL } from './config';
 
 // Editorial Brutalist Skeleton Loader
@@ -96,6 +98,14 @@ function App() {
     "sad indie heartbreak"
   ]);
   const resultsPerPage = 6;
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.initialQuery) {
+      setQuery(location.state.initialQuery);
+      handleSearch(location.state.initialQuery);
+    }
+  }, [location.state]);
 
   const fetchPopularSearches = async () => {
     try {
@@ -430,17 +440,7 @@ function App() {
         </main>
       )}
 
-      {/* Footer */}
-      <footer className="w-full py-stack-md px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto bg-surface border-t border-[#E2E1DC] mt-auto">
-        <span className="font-metadata text-metadata text-secondary mb-4 md:mb-0">
-          © 2024 Lyricist Editorial. All rights reserved.
-        </span>
-        <div className="flex space-x-6">
-          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Privacy</a>
-          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Terms</a>
-          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Archive</a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

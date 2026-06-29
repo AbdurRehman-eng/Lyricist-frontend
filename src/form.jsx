@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/navbar';
+import Footer from './components/footer';
 import { API_BASE_URL } from './config';
 
 export default function AddSongForm() {
@@ -226,16 +227,7 @@ export default function AddSongForm() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="w-full py-stack-md px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto border-t border-[#E2E1DC] bg-surface mt-auto">
-        <span className="font-label-caps text-label-caps text-primary">Lyricist</span>
-        <div className="flex gap-stack-md mt-stack-md md:mt-0">
-          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Privacy</a>
-          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Terms</a>
-          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Archive</a>
-        </div>
-        <span className="font-metadata text-metadata text-secondary mt-stack-md md:mt-0">© 2024 Lyricist Editorial. All rights reserved.</span>
-      </footer>
+      <Footer />
     </div>
   );
 }

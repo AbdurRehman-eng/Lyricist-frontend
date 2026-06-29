@@ -7,6 +7,9 @@ import Splash from './Splash';
 import './index.css';
 import AboutPage from './About';
 import AddSongForm from './form';
+import PrivacyPage from './Privacy';
+import TermsPage from './Terms';
+import ArchivePage from './Archive';
 import { ThemeProvider } from './ThemeContext';
 
 function Main() {
@@ -18,7 +21,10 @@ function Main() {
           <Route path="/main" element={<App />} />
           <Route path="/audio-search" element={<AudioSearch />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path='/form' element={<AddSongForm />} />
+          <Route path="/form" element={<AddSongForm />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/archive" element={<ArchivePage />} />
         </Routes>
       </Router>
     </ThemeProvider>
