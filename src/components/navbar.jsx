@@ -20,7 +20,7 @@ export default function Navbar() {
             to="/main" 
             className="flex items-center gap-2 font-headline-md text-headline-md text-primary tracking-tighter hover:opacity-85 transition-opacity"
           >
-            <img src="/favicon-32x32.png" alt="Lyricist logo" className="w-5 h-5 rounded-sm" />
+            <img src="/android-chrome-192x192.png" alt="Lyricist logo" className="w-7 h-7 rounded-sm" />
             Lyricist
           </Link>
           <nav className="hidden md:flex gap-6 items-center">
