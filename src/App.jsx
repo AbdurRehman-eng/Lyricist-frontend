@@ -329,7 +329,7 @@ function App() {
                         Showing results for '{results.query}'
                       </h1>
                       <span className="font-metadata text-metadata text-secondary">
-                        {results.ranked_results.length} results found
+                        {results.ranked_results.length} results found {results.search_time_ms !== undefined && `in ${results.search_time_ms} ms`}
                       </span>
                     </div>
 

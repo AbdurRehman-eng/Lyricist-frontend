@@ -388,7 +388,7 @@ export default function AudioSearch() {
                     </h1>
                     <div className="flex justify-between items-baseline mt-4 w-full">
                       <span className="font-metadata text-metadata text-secondary">
-                        Found {results.ranked_results.length} matches
+                        Found {results.ranked_results.length} matches {results.search_time_ms !== undefined && `in ${results.search_time_ms} ms`}
                       </span>
                       <button
                         id="audio-reset-button"
