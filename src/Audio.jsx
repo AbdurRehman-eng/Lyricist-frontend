@@ -131,6 +131,60 @@ export default function AudioSearch() {
     };
   }, [recognitionInstance]);
 
+  // ─── MediaRecorder path (server-side AssemblyAI transcription) ──────────────
+  const startMediaRecorderRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      setMediaRecorder(recorder);
+
+      const audioChunks = [];
+      recorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+
+        setIsLoading(true);
+        setError(null);
+        setResults(null);
+        setTranscription('');
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/transcribe`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await response.json();
+          setIsLoading(false);
+          if (response.ok) {
+            setTranscription(data.transcription);
+            setResults(data);
+            setSearchTime(data.search_time_ms ?? null);
+          } else {
+            console.error('Error transcribing audio:', data.error);
+            setError(data.error || 'Failed to transcribe audio.');
+          }
+        } catch (err) {
+          console.error('Network error during transcription:', err);
+          setIsLoading(false);
+          setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
+        }
+      };
+
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      setError('Microphone access denied. Please enable permissions in your browser.');
+    }
+  };
+
+  // ─── Web Speech API path (instant, browser-native) ──────────────────────────
   const startRecording = async () => {
     setError(null);
     setResults(null);
@@ -151,7 +205,7 @@ export default function AudioSearch() {
           const transcriptText = event.results[0][0].transcript;
           setTranscription(transcriptText);
           setIsLoading(true);
-          
+
           try {
             const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(transcriptText)}`);
             const data = await response.json();
@@ -169,12 +223,22 @@ export default function AudioSearch() {
           }
         };
 
-        rec.onerror = (event) => {
+        rec.onerror = async (event) => {
           console.error('Speech recognition error:', event.error);
-          if (event.error !== 'no-speech') {
-            setError(`Speech recognition error: ${event.error}`);
-          }
           setIsRecording(false);
+
+          if (event.error === 'network') {
+            // Browser's built-in speech recognition can't reach Google's servers.
+            // Automatically fall back to server-side AssemblyAI transcription.
+            console.warn('Web Speech API network error — falling back to server-side transcription.');
+            await startMediaRecorderRecording();
+          } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            setError('Microphone access denied. Please allow microphone access in your browser settings.');
+          } else if (event.error !== 'no-speech') {
+            // For any other unexpected error, fall back silently to server-side path
+            console.warn(`Unhandled speech error "${event.error}" — falling back to server-side transcription.`);
+            await startMediaRecorderRecording();
+          }
         };
 
         rec.onend = () => {
@@ -185,74 +249,26 @@ export default function AudioSearch() {
         setRecognitionInstance(rec);
       } catch (err) {
         console.error('Error starting speech recognition:', err);
-        setError('Failed to start speech recognition.');
+        // If the SpeechRecognition constructor itself fails, fall back to MediaRecorder
+        await startMediaRecorderRecording();
       }
     } else {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        setMediaRecorder(recorder);
-
-        const audioChunks = [];
-        recorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
-
-        recorder.onstop = async () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          const formData = new FormData();
-          formData.append('audio', audioBlob, 'audio.webm');
-
-          setIsLoading(true);
-          setError(null);
-          setResults(null);
-          setTranscription('');
-          
-          try {
-            const response = await fetch(`${API_BASE_URL}/transcribe`, {
-              method: 'POST',
-              body: formData,
-            });
-
-            const data = await response.json();
-            setIsLoading(false);
-            if (response.ok) {
-              setTranscription(data.transcription);
-              setResults(data);
-              setSearchTime(data.search_time_ms ?? null);
-            } else {
-              console.error('Error transcribing audio:', data.error);
-              setError(data.error || 'Failed to index sound.');
-            }
-          } catch (err) {
-            console.error('Network error during transcription:', err);
-            setIsLoading(false);
-            setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
-          }
-        };
-
-        recorder.start();
-        setIsRecording(true);
-      } catch (err) {
-        console.error('Error accessing microphone:', err);
-        setError('Microphone access denied. Please enable permissions.');
-      }
+      // Browser doesn't support Web Speech API at all — go straight to MediaRecorder
+      await startMediaRecorderRecording();
     }
   };
 
   const stopRecording = () => {
-    if (isSpeechSupported) {
-      if (recognitionInstance) {
-        recognitionInstance.stop();
-      }
-      setIsRecording(false);
-    } else {
-      if (mediaRecorder) {
-        mediaRecorder.stop();
-        setIsRecording(false);
-      }
+    // Stop whichever recording mode is currently active
+    if (recognitionInstance) {
+      try { recognitionInstance.stop(); } catch (_) {}
     }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    setIsRecording(false);
   };
+
 
   const handleReset = () => {
     if (recognitionInstance) {
