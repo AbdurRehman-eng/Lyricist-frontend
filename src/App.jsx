@@ -100,6 +100,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchTime, setSearchTime] = useState(null);
   const [suggestions, setSuggestions] = useState([
     "i will always love you",
     "hotel california",
@@ -144,6 +145,7 @@ function App() {
     setResults(null);
     setCurrentPage(1);
     setHasSearched(true);
+    setSearchTime(null);
     
     try {
       const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(searchQuery)}`);
@@ -151,6 +153,7 @@ function App() {
       setIsLoading(false);
       if (response.ok) {
         setResults(data);
+        setSearchTime(data.search_time_ms ?? null);
         fetchPopularSearches();
       } else {
         setError(data.error || 'No results found.');
@@ -179,6 +182,7 @@ function App() {
     setError(null);
     setHasSearched(false);
     setCurrentPage(1);
+    setSearchTime(null);
   };
 
   const paginatedResults = results
@@ -328,9 +332,16 @@ function App() {
                       <h1 className="font-headline-md text-[20px] text-primary">
                         Showing results for '{results.query}'
                       </h1>
-                      <span className="font-metadata text-metadata text-secondary">
-                        {results.ranked_results.length} results found {results.search_time_ms !== undefined && `in ${results.search_time_ms} ms`}
-                      </span>
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span className="font-metadata text-metadata text-secondary">
+                          {results.ranked_results.length} results found
+                        </span>
+                        {searchTime !== null && (
+                          <span className="font-metadata text-[11px] text-[#BBBBB7]">
+                            {searchTime < 1000 ? `${searchTime} ms` : `${(searchTime / 1000).toFixed(2)} s`}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

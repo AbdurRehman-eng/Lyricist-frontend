@@ -18,8 +18,9 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
           <Link 
             to="/main" 
-            className="font-headline-md text-headline-md text-primary tracking-tighter hover:opacity-85 transition-opacity"
+            className="flex items-center gap-2 font-headline-md text-headline-md text-primary tracking-tighter hover:opacity-85 transition-opacity"
           >
+            <img src="/favicon-32x32.png" alt="Lyricist logo" className="w-5 h-5 rounded-sm" />
             Lyricist
           </Link>
           <nav className="hidden md:flex gap-6 items-center">

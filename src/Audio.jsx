@@ -101,6 +101,7 @@ export default function AudioSearch() {
   const [recognitionInstance, setRecognitionInstance] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTime, setSearchTime] = useState(null);
   const resultsPerPage = 6;
 
   // Real-time Waveform Animation Heights (28 bars)
@@ -157,6 +158,7 @@ export default function AudioSearch() {
             setIsLoading(false);
             if (response.ok) {
               setResults(data);
+              setSearchTime(data.search_time_ms ?? null);
             } else {
               setError(data.error || 'No results found.');
             }
@@ -217,6 +219,7 @@ export default function AudioSearch() {
             if (response.ok) {
               setTranscription(data.transcription);
               setResults(data);
+              setSearchTime(data.search_time_ms ?? null);
             } else {
               console.error('Error transcribing audio:', data.error);
               setError(data.error || 'Failed to index sound.');
@@ -260,6 +263,7 @@ export default function AudioSearch() {
     setResults(null);
     setError(null);
     setCurrentPage(1);
+    setSearchTime(null);
   };
 
   const paginatedResults = results
@@ -387,9 +391,16 @@ export default function AudioSearch() {
                       "{transcription || "Unknown Humming"}"
                     </h1>
                     <div className="flex justify-between items-baseline mt-4 w-full">
-                      <span className="font-metadata text-metadata text-secondary">
-                        Found {results.ranked_results.length} matches {results.search_time_ms !== undefined && `in ${results.search_time_ms} ms`}
-                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-metadata text-metadata text-secondary">
+                          Found {results.ranked_results.length} matches
+                        </span>
+                        {searchTime !== null && (
+                          <span className="font-metadata text-[11px] text-[#BBBBB7]">
+                            {searchTime < 1000 ? `${searchTime} ms` : `${(searchTime / 1000).toFixed(2)} s`}
+                          </span>
+                        )}
+                      </div>
                       <button
                         id="audio-reset-button"
                         onClick={handleReset}
