@@ -100,12 +100,17 @@ function App() {
   const fetchPopularSearches = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/popular_searches`);
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) {
         setSuggestions(data);
       }
+      setError(null);
     } catch (err) {
       console.error('Error fetching popular searches:', err);
+      setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
     }
   };
 
@@ -134,7 +139,7 @@ function App() {
     } catch (err) {
       console.error('Error fetching data:', err);
       setIsLoading(false);
-      setError('An error occurred while fetching the data.');
+      setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
     }
   };
 

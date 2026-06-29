@@ -14,7 +14,7 @@ function Main() {
     <ThemeProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Splash />} />
+          <Route path="/" element={<App />} />
           <Route path="/main" element={<App />} />
           <Route path="/audio-search" element={<AudioSearch />} />
           <Route path="/about" element={<AboutPage />} />

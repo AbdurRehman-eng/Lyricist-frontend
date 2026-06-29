@@ -75,7 +75,11 @@ export default function AddSongForm() {
       setSuccess(true);
       setFormData({ name: '', spotifyLink: '', artists: '', album: '', lyrics: '' });
     } catch (err) {
-      setError(err.message || 'An error occurred while submitting the form.');
+      if (err.name === 'TypeError' || err.message.includes('Failed to fetch')) {
+        setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
+      } else {
+        setError(err.message || 'An error occurred while submitting the form.');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -155,7 +155,7 @@ export default function AudioSearch() {
           } catch (err) {
             console.error('Error fetching search results for transcription:', err);
             setIsLoading(false);
-            setError('An error occurred while fetching the search results.');
+            setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
           }
         };
 
@@ -216,7 +216,7 @@ export default function AudioSearch() {
           } catch (err) {
             console.error('Network error during transcription:', err);
             setIsLoading(false);
-            setError('Could not connect to the transcription server.');
+            setError('Unable to connect to the backend server. Please check your internet connection or verify the server is running.');
           }
         };
 
